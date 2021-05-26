@@ -43,7 +43,7 @@ export default {
           titleElement.innerHTML = settings.title_text;
           component.set("titleElement", titleElement);
 
-          ajax(`http://blendernation.com/scripts/ba-features-tagged.json`)
+          ajax(`https://blendernation.com/scripts/ba-features-tagged.json`)
             .then((result) => {
               // Get posts from tag
               let customFeaturedTopics = [];
