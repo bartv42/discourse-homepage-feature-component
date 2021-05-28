@@ -4,8 +4,8 @@ featured_tag:
 number_of_topics:
   default: 3
   min: 1
-  max: 5
-  description: Display up to 5 topics at max-width
+  max: 6
+  description: Display up to 6 topics at max-width
 
 sort_by_created:
   default: true
