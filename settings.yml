@@ -1,6 +1,16 @@
 featured_tag:
   default: featured
 
+number_of_topics:
+  default: 3
+  min: 1
+  max: 5
+  description: Display up to 5 topics at max-width
+
+sort_by_created:
+  default: true
+  description: Disable to sort by latest activity
+
 hide_featured_tag:
   default: false
   description: When this is enabled the featured tag will be hidden from users that aren't admins/moderators.
@@ -11,7 +21,6 @@ show_on:
   choices:
     - top_menu
     - homepage
-    - all
   description: top_menu refers to the <a href="/admin/site_settings/category/all_results?filter=top_menu">top menu site setting</a>
 
 show_for:

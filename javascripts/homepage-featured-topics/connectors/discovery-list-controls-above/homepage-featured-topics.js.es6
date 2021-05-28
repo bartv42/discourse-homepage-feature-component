@@ -1,34 +1,31 @@
 import { ajax } from "discourse/lib/ajax";
 import Topic from "discourse/models/topic";
 import { withPluginApi } from "discourse/lib/plugin-api";
+import { getOwner } from "discourse-common/lib/get-owner";
 
 const FEATURED_CLASS = "homepage-featured-topics";
 
 export default {
   setupComponent(args, component) {
-    const topMenuRoutes = Discourse.SiteSettings.top_menu
-      .split("|")
-      .filter(Boolean)
-      .map((route) => `/${route}`);
-
-    const homeRoute = topMenuRoutes[0];
-
     withPluginApi("0.1", (api) => {
       api.onPageChange((url) => {
         if (!settings.featured_tag) {
           return;
         }
 
-        const home = url === "/" || url.match(/^\/\?/) || url === homeRoute;
+        const topMenuRoutes = this.siteSettings.top_menu
+          .split("|")
+          .filter(Boolean);
+
+        const homeRoute = topMenuRoutes[0];
+        const router = getOwner(this).lookup("router:main");
+        const route = router.currentRoute;
 
         let showBannerHere;
         if (settings.show_on === "homepage") {
-          showBannerHere = home;
+          showBannerHere = route.localName === homeRoute;
         } else if (settings.show_on === "top_menu") {
-          showBannerHere = topMenuRoutes.indexOf(url) > -1 || home;
-        } else {
-          showBannerHere =
-            url.match(/.*/) && !url.match(/search.*/) && !url.match(/admin.*/);
+          showBannerHere = topMenuRoutes.includes(route.localName);
         }
 
         if (showBannerHere) {
@@ -36,26 +33,50 @@ export default {
 
           component.setProperties({
             displayHomepageFeatured: true,
-            loadingFeatures: true,
           });
 
-          const titleElement = document.createElement("h2");
-          titleElement.innerHTML = settings.title_text;
-          component.set("titleElement", titleElement);
-
-	  ajax(`http://blendernation.com/scripts/ba-features-tagged.json`)
-          //ajax(`/tag/${settings.featured_tag}.json`)
+          ajax(`/tag/${settings.featured_tag}.json`)
             .then((result) => {
               // Get posts from tag
               let customFeaturedTopics = [];
-              result.topic_list.topics
-                .slice(0, 6)
-                .forEach((topic) =>
-                  customFeaturedTopics.push(Topic.create(topic))
-                );
+              result.topic_list.topics.forEach((topic) =>
+                topic.image_url
+                  ? customFeaturedTopics.push(Topic.create(topic))
+                  : ""
+              );
+
+              customFeaturedTopics = customFeaturedTopics.slice(
+                0,
+                settings.number_of_topics
+              );
+
+              if (customFeaturedTopics.length && settings.show_title) {
+                const titleElement = document.createElement("h2");
+                titleElement.innerHTML = settings.title_text;
+                component.set("titleElement", titleElement);
+              }
+
+              if (settings.sort_by_created) {
+                customFeaturedTopics = customFeaturedTopics.sort(function (
+                  a,
+                  b
+                ) {
+                  return a.created_at > b.created_at
+                    ? -1
+                    : a.created_at < b.created_at
+                    ? 1
+                    : 0;
+                });
+              }
+
               component.set("customFeaturedTopics", customFeaturedTopics);
+
+              if (customFeaturedTopics.length) {
+                component.set("displayCustomFeatured", true);
+              } else {
+                component.set("displayCustomFeatured", false);
+              }
             })
-            .finally(() => component.set("loadingFeatures", false))
             .catch((e) => {
               // the featured tag doesn't exist
               if (e.jqXHR && e.jqXHR.status === 404) {
@@ -66,6 +87,7 @@ export default {
         } else {
           document.querySelector("html").classList.remove(FEATURED_CLASS);
           component.set("displayHomepageFeatured", false);
+          component.set("displayCustomFeatured", true);
         }
 
         if (settings.show_for === "everyone") {
