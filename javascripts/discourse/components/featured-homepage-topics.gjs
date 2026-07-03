@@ -145,10 +145,28 @@ export default class FeaturedHomepageTopics extends Component {
       .filter(Boolean);
   }
 
-  @action
-  async getBannerTopics() {
+  async fetchTopicsFromUrl() {
+    // Custom source: an external endpoint returning a Discourse-style
+    // topic list JSON, already ordered as desired (e.g. by tag date).
+    const response = await fetch(settings.featured_topics_url, {
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `[featured-homepage-topics] failed to fetch ${settings.featured_topics_url}: ${response.status}`
+      );
+      return [];
+    }
+
+    const data = await response.json();
+    return data?.topic_list?.topics || [];
+  }
+
+  async fetchTopicsFromTags() {
     if (this.featuredTags.length === 0) {
-      return;
+      return [];
     }
 
     const sortOrder = settings.sort_by_created ? "created" : "activity";
@@ -160,7 +178,16 @@ export default class FeaturedHomepageTopics extends Component {
       },
     });
 
-    this.filteredTopics = topicList.topics
+    return topicList.topics;
+  }
+
+  @action
+  async getBannerTopics() {
+    const topics = settings.featured_topics_url
+      ? await this.fetchTopicsFromUrl()
+      : await this.fetchTopicsFromTags();
+
+    this.filteredTopics = topics
       .filter(
         (topic) =>
           topic.image_url && (!settings.hide_closed_topics || !topic.closed)

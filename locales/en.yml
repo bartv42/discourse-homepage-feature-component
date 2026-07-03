@@ -3,6 +3,7 @@ en:
   page_number: "Page %{pageNumber}"
   theme_metadata:
     settings:
+      featured_topics_url: Optional. URL returning a Discourse-style topic list JSON (<code>{"topic_list":{"topics":[...]}}</code>). When set, topics are loaded from this URL in the order provided (e.g. sorted by tag date) instead of via the featured tag. The endpoint must send CORS headers allowing this forum's origin.
       number_of_topics: Display up to 5 topics at max-width
       max_number_of_topics: Maximum number of featured topics. If set higher than number_of_topics then arrows will be displayed for paging through the topics.
       pages_loop: If pagination is enabled (max_number_of_topics > number_of_topics), pages continue back to the first page after the last.

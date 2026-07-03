@@ -3,6 +3,10 @@ featured_tag:
   list_type: tag
   default: featured
 
+featured_topics_url:
+  type: string
+  default: ""
+
 number_of_topics:
   default: 3
   min: 1
