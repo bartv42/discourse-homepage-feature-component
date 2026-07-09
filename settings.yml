@@ -51,6 +51,9 @@ title_text:
 sort_by_created:
   default: true
 
+sort_by_tag_date:
+  default: false
+
 show_all_always:
   default: false
 

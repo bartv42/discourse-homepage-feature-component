@@ -12,6 +12,7 @@ en:
       make_collapsible: Make the entire component collapsible
       show_title: displays the text set below (title is always shown when make_collapsible is on)
       sort_by_created: Disable to sort by latest activity
+      sort_by_tag_date: Sort the featured topics by when the tag was applied (newest first), overriding sort_by_created. Requires the <a href="https://github.com/bartv42/discourse-sort-by-tagging-date">discourse-sort-by-tagging-date</a> plugin. Only works with a single featured tag.
       show_all_always: By default the amount of shown topics is decreased with the screen size, down to only 1 on mobile. Checking this setting will show all on any screen size.
       hide_closed_topics: Hide closed topics from the featured topic list
       always_link_to_first_post: Always link to the first post in the topic, even if it has been read before
