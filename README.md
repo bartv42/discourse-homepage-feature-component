@@ -10,42 +10,14 @@ By default the theme will feature the 3 most recent topics tagged featured and w
 
 ## Fork changes
 
-### External topic source (`featured_topics_url`)
+### Sort by tagging date (`sort_by_tag_date`)
 
-This fork adds an optional `featured_topics_url` setting. When set, featured
-topics are loaded from an external endpoint **in the order provided** instead of
-from the featured tag — a workaround for Discourse not being able to sort a
-topic list by when a tag was applied (e.g. to order the row by tag date).
+This fork adds a `sort_by_tag_date` setting. When enabled, the featured row is
+ordered by **when the tag was applied** (newest first) instead of by topic
+creation date or latest activity — something Discourse core cannot do on its own.
 
-The endpoint must return a Discourse-style topic list JSON and send CORS headers
-allowing the forum's origin:
-
-```json
-{
-  "topic_list": {
-    "topics": [
-      {
-        "fancy_title": "Puppet Guard Warrior",
-        "slug": "puppet-guard-warrior",
-        "id": 1645831,
-        "image_url": "https://example.com/uploads/.../image_400x249.jpeg",
-        "last_read_post_number": 1,
-        "closed": false,
-        "thumbnails": [
-          { "url": "https://example.com/.../image_400x249.jpeg", "width": 400 },
-          { "url": "https://example.com/.../image_800x498.jpeg", "width": 800 }
-        ]
-      }
-    ]
-  }
-}
-```
-
-- `id`, `slug`, `fancy_title`, `image_url`, `last_read_post_number` are required.
-- `thumbnails` (`[{ url, width }]`) is optional and enables a responsive
-  `srcset`; `image_url` is used as the fallback.
-- `closed` (boolean) is optional and lets the `hide_closed_topics` setting work.
-
-If the endpoint is unreachable, times out, or returns an unexpected shape, the
-component logs a warning and falls back to the tag-based topic list so the
-featured row is never empty.
+It works by requesting the tag topic list with `order=tag_date`, which requires
+the companion plugin
+[discourse-sort-by-tagging-date](https://github.com/bartv42/discourse-sort-by-tagging-date)
+to be installed. The setting only takes effect with a single featured tag; with
+multiple tags Discourse's default ordering applies.

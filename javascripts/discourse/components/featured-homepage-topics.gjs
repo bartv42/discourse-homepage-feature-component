@@ -18,7 +18,6 @@ import { and, not } from "discourse/truth-helpers";
 import { i18n } from "discourse-i18n";
 
 const FEATURED_CLASS = "featured-homepage-topics";
-const FETCH_TIMEOUT_MS = 8000;
 
 export default class FeaturedHomepageTopics extends Component {
   @service router;
@@ -146,45 +145,6 @@ export default class FeaturedHomepageTopics extends Component {
       .filter(Boolean);
   }
 
-  async fetchTopicsFromUrl() {
-    // Custom source: an external endpoint returning a Discourse-style topic
-    // list JSON, already ordered as desired (e.g. by tag date). Each topic
-    // should provide id, slug, fancy_title, image_url and last_read_post_number;
-    // optional `thumbnails` ([{ url, width }]) enables responsive srcset and
-    // `closed` (boolean) enables the hide_closed_topics setting.
-    const url = settings.featured_topics_url;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-    try {
-      const response = await fetch(url, {
-        headers: { Accept: "application/json" },
-        signal: controller.signal,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      const topics = data?.topic_list?.topics;
-      if (!Array.isArray(topics)) {
-        throw new Error("no topic_list.topics array in response");
-      }
-
-      return topics;
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `[featured-homepage-topics] could not load ${url}; falling back to featured tags`,
-        e
-      );
-      return this.fetchTopicsFromTags();
-    } finally {
-      clearTimeout(timeoutId);
-    }
-  }
-
   async fetchTopicsFromTags() {
     if (this.featuredTags.length === 0) {
       return [];
@@ -212,9 +172,7 @@ export default class FeaturedHomepageTopics extends Component {
 
   @action
   async getBannerTopics() {
-    const topics = settings.featured_topics_url
-      ? await this.fetchTopicsFromUrl()
-      : await this.fetchTopicsFromTags();
+    const topics = await this.fetchTopicsFromTags();
 
     this.filteredTopics = topics
       .filter(
