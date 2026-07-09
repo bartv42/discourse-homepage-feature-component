@@ -10,14 +10,17 @@ By default the theme will feature the 3 most recent topics tagged featured and w
 
 ## Fork changes
 
-### Sort by tagging date (`sort_by_tag_date`)
+### Sort order (`sort_order`)
 
-This fork adds a `sort_by_tag_date` setting. When enabled, the featured row is
-ordered by **when the tag was applied** (newest first) instead of by topic
-creation date or latest activity — something Discourse core cannot do on its own.
+This fork replaces upstream's `sort_by_created` checkbox with a `sort_order`
+dropdown offering three modes:
 
-It works by requesting the tag topic list with `order=tag_date`, which requires
-the companion plugin
+- `activity` — latest activity (Discourse default)
+- `created` — topic creation date
+- `tag_date` — **when the tag was applied** (newest first), something Discourse
+  core cannot do on its own
+
+The `tag_date` mode requests the tag topic list with `order=tag_date`, which
+requires the companion plugin
 [discourse-sort-by-tagging-date](https://github.com/bartv42/discourse-sort-by-tagging-date)
-to be installed. The setting only takes effect with a single featured tag; with
-multiple tags Discourse's default ordering applies.
+to be installed, and only works with a single featured tag.

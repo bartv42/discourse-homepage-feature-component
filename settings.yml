@@ -44,11 +44,13 @@ show_title:
 title_text:
   default: "Featured Topics"
 
-sort_by_created:
-  default: true
-
-sort_by_tag_date:
-  default: false
+sort_order:
+  default: created
+  type: enum
+  choices:
+    - activity
+    - created
+    - tag_date
 
 show_all_always:
   default: false

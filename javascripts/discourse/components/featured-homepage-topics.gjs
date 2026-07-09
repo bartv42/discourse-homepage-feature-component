@@ -152,12 +152,7 @@ export default class FeaturedHomepageTopics extends Component {
 
     // "tag_date" relies on the discourse-sort-by-tagging-date plugin, which
     // adds an order=tag_date filter to tag topic lists (incl. latest?tags=).
-    let sortOrder;
-    if (settings.sort_by_tag_date) {
-      sortOrder = "tag_date";
-    } else {
-      sortOrder = settings.sort_by_created ? "created" : "activity";
-    }
+    const sortOrder = settings.sort_order;
 
     const topicList = await this.store.findFiltered("topicList", {
       filter: "latest",
